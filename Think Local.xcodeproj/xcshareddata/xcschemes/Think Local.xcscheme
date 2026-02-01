@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "860E9CCD2CB055B000C5BB52"
-               BuildableName = "fullmoon.app"
-               BlueprintName = "fullmoon"
-               ReferencedContainer = "container:fullmoon.xcodeproj">
+               BuildableName = "Think Local.app"
+               BlueprintName = "Think Local"
+               ReferencedContainer = "container:Think Local.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "860E9CCD2CB055B000C5BB52"
-            BuildableName = "fullmoon.app"
-            BlueprintName = "fullmoon"
-            ReferencedContainer = "container:fullmoon.xcodeproj">
+            BuildableName = "Think Local.app"
+            BlueprintName = "Think Local"
+            ReferencedContainer = "container:Think Local.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "860E9CCD2CB055B000C5BB52"
-            BuildableName = "fullmoon.app"
-            BlueprintName = "fullmoon"
-            ReferencedContainer = "container:fullmoon.xcodeproj">
+            BuildableName = "Think Local.app"
+            BlueprintName = "Think Local"
+            ReferencedContainer = "container:Think Local.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -16,9 +16,18 @@ struct OnboardingInstallModelView: View {
     @State var selectedModel = ModelConfiguration.defaultModel
     let suggestedModel = ModelConfiguration.defaultModel
 
+    private static let sizeFormatter: NumberFormatter = {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.minimumFractionDigits = 2
+        f.maximumFractionDigits = 2
+        return f
+    }()
+
     func sizeBadge(_ model: ModelConfiguration?) -> String? {
         guard let size = model?.modelSize else { return nil }
-        return "\(size) GB"
+        let formatted = Self.sizeFormatter.string(from: size as NSNumber) ?? "\(size)"
+        return "\(formatted) GB"
     }
 
     /// The maximum allowable model size as a fraction of the device's total RAM.

@@ -17,16 +17,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		860E9CCE2CB055B000C5BB52 /* fullmoon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = fullmoon.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		860E9CCE2CB055B000C5BB52 /* Think Local.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Think Local.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		258729302D0785A700BB7B6F /* Exceptions for "fullmoon" folder in "fullmoon" target */ = {
+		258729302D0785A700BB7B6F /* Exceptions for "fullmoon" folder in "Think Local" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 860E9CCD2CB055B000C5BB52 /* fullmoon */;
+			target = 860E9CCD2CB055B000C5BB52 /* Think Local */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -34,7 +34,7 @@
 		860E9CD02CB055B000C5BB52 /* fullmoon */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				258729302D0785A700BB7B6F /* Exceptions for "fullmoon" folder in "fullmoon" target */,
+				258729302D0785A700BB7B6F /* Exceptions for "fullmoon" folder in "Think Local" target */,
 			);
 			path = fullmoon;
 			sourceTree = "<group>";
@@ -71,7 +71,7 @@
 		860E9CCF2CB055B000C5BB52 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				860E9CCE2CB055B000C5BB52 /* fullmoon.app */,
+				860E9CCE2CB055B000C5BB52 /* Think Local.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -86,9 +86,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		860E9CCD2CB055B000C5BB52 /* fullmoon */ = {
+		860E9CCD2CB055B000C5BB52 /* Think Local */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 860E9CDF2CB055B100C5BB52 /* Build configuration list for PBXNativeTarget "fullmoon" */;
+			buildConfigurationList = 860E9CDF2CB055B100C5BB52 /* Build configuration list for PBXNativeTarget "Think Local" */;
 			buildPhases = (
 				860E9CCA2CB055B000C5BB52 /* Sources */,
 				860E9CCB2CB055B000C5BB52 /* Frameworks */,
@@ -101,7 +101,7 @@
 			fileSystemSynchronizedGroups = (
 				860E9CD02CB055B000C5BB52 /* fullmoon */,
 			);
-			name = fullmoon;
+			name = "Think Local";
 			packageProductDependencies = (
 				286214552F2F5BB8006CD51E /* MLXEmbedders */,
 				286214572F2F5BB8006CD51E /* MLXLLM */,
@@ -112,7 +112,7 @@
 				286214622F2F5C22006CD51E /* MarkdownUI */,
 			);
 			productName = fullmoon;
-			productReference = 860E9CCE2CB055B000C5BB52 /* fullmoon.app */;
+			productReference = 860E9CCE2CB055B000C5BB52 /* Think Local.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -130,7 +130,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 860E9CC92CB055B000C5BB52 /* Build configuration list for PBXProject "fullmoon" */;
+			buildConfigurationList = 860E9CC92CB055B000C5BB52 /* Build configuration list for PBXProject "Think Local" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -148,7 +148,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				860E9CCD2CB055B000C5BB52 /* fullmoon */,
+				860E9CCD2CB055B000C5BB52 /* Think Local */,
 			);
 		};
 /* End PBXProject section */
@@ -302,7 +302,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = fullmoon/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = fullmoon;
+				INFOPLIST_KEY_CFBundleDisplayName = "Think Local";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -319,7 +319,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = me.mainfra.fullmoonnnh;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = NO;
@@ -349,7 +349,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = fullmoon/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = fullmoon;
+				INFOPLIST_KEY_CFBundleDisplayName = "Think Local";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -366,7 +366,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = me.mainfra.fullmoonnnh;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = NO;
@@ -385,7 +385,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		860E9CC92CB055B000C5BB52 /* Build configuration list for PBXProject "fullmoon" */ = {
+		860E9CC92CB055B000C5BB52 /* Build configuration list for PBXProject "Think Local" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				860E9CDD2CB055B100C5BB52 /* Debug */,
@@ -394,7 +394,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		860E9CDF2CB055B100C5BB52 /* Build configuration list for PBXNativeTarget "fullmoon" */ = {
+		860E9CDF2CB055B100C5BB52 /* Build configuration list for PBXNativeTarget "Think Local" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				860E9CE02CB055B100C5BB52 /* Debug */,

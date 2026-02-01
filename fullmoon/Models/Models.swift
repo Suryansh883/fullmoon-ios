@@ -53,6 +53,37 @@ extension ModelConfiguration: @retroactive Equatable {
         id: "mlx-community/Qwen3-8B-4bit"
     )
 
+    // Gemma 2
+    public static let gemma_2_2b_it_4bit = ModelConfiguration(
+        id: "mlx-community/gemma-2-2b-it-4bit"
+    )
+
+    // Gemma 3
+    public static let gemma_3_1b_it_4bit = ModelConfiguration(
+        id: "mlx-community/gemma-3-1b-it-4bit"
+    )
+    public static let gemma_3_270m_4bit = ModelConfiguration(
+        id: "mlx-community/gemma-3-270m-4bit"
+    )
+
+    // IBM Granite 4.0
+    public static let granite_4_0_h_tiny_3bit = ModelConfiguration(
+        id: "mlx-community/granite-4.0-h-tiny-3bit-MLX"
+    )
+    public static let granite_4_0_h_1b_4bit = ModelConfiguration(
+        id: "mlx-community/granite-4.0-h-1b-4bit"
+    )
+    // Qwen 3
+    public static let qwen_3_vl_2b_4bit = ModelConfiguration(
+        id: "mlx-community/Qwen3-VL-2B-Instruct-4bit"
+    )
+    public static let qwen_3_1_7b_4bit = ModelConfiguration(
+        id: "mlx-community/Qwen3-1.7B-4bit"
+    )
+    public static let qwen_3_0_6b_4bit = ModelConfiguration(
+        id: "mlx-community/Qwen3-0.6B-4bit"
+    )
+
     public static var availableModels: [ModelConfiguration] = [
         llama_3_2_1b_4bit,
         llama_3_2_3b_4bit,
@@ -60,6 +91,14 @@ extension ModelConfiguration: @retroactive Equatable {
         deepseek_r1_distill_qwen_1_5b_8bit,
         qwen_3_4b_4bit,
         qwen_3_8b_4bit,
+        gemma_2_2b_it_4bit,
+        gemma_3_1b_it_4bit,
+        gemma_3_270m_4bit,
+        granite_4_0_h_tiny_3bit,
+        granite_4_0_h_1b_4bit,
+        qwen_3_vl_2b_4bit,
+        qwen_3_1_7b_4bit,
+        qwen_3_0_6b_4bit,
     ]
 
     public static var defaultModel: ModelConfiguration {
@@ -120,6 +159,14 @@ extension ModelConfiguration: @retroactive Equatable {
         case .deepseek_r1_distill_qwen_1_5b_8bit: return 1.9
         case .qwen_3_4b_4bit: return 2.3
         case .qwen_3_8b_4bit: return 4.7
+        case .gemma_2_2b_it_4bit: return 1.47
+        case .gemma_3_1b_it_4bit: return 0.733
+        case .gemma_3_270m_4bit: return 0.463
+        case .granite_4_0_h_tiny_3bit: return 1.81
+        case .granite_4_0_h_1b_4bit: return 1.2
+        case .qwen_3_vl_2b_4bit: return 1.8
+        case .qwen_3_1_7b_4bit: return 0.979
+        case .qwen_3_0_6b_4bit: return 0.346
         default: return nil
         }
     }
