@@ -91,7 +91,15 @@ class AppManager: ObservableObject {
     }
     
     func modelDisplayName(_ modelName: String) -> String {
+        if modelName == appleIntelligenceModelId {
+            return "Apple Intelligence"
+        }
         return modelName.replacingOccurrences(of: "mlx-community/", with: "").lowercased()
+    }
+
+    /// Installed models for display: Apple Intelligence (when available) at top, then downloaded MLX models.
+    var displayedInstalledModels: [String] {
+        (AppleIntelligenceService.isAvailable ? [appleIntelligenceModelId] : []) + installedModels
     }
     
     func getMoonPhaseIcon() -> String {

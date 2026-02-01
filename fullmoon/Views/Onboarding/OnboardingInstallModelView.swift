@@ -62,10 +62,10 @@ struct OnboardingInstallModelView: View {
             }
             .listRowBackground(Color.clear)
 
-            if appManager.installedModels.count > 0 {
+            if appManager.displayedInstalledModels.count > 0 {
                 Section(header: Text("installed")) {
-                    ForEach(appManager.installedModels, id: \.self) { modelName in
-                        let model = ModelConfiguration.getModelByName(modelName)
+                    ForEach(appManager.displayedInstalledModels, id: \.self) { modelName in
+                        let model = modelName == appleIntelligenceModelId ? nil : ModelConfiguration.getModelByName(modelName)
                         Button {} label: {
                             Label {
                                 Text(appManager.modelDisplayName(modelName))
@@ -73,7 +73,7 @@ struct OnboardingInstallModelView: View {
                                 Image(systemName: "checkmark")
                             }
                         }
-                        .badge(sizeBadge(model))
+                        .badge(modelName == appleIntelligenceModelId ? nil : sizeBadge(model))
                         #if os(macOS)
                             .buttonStyle(.borderless)
                         #endif

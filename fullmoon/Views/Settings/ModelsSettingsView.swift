@@ -16,7 +16,7 @@ struct ModelsSettingsView: View {
     var body: some View {
         Form {
             Section(header: Text("installed")) {
-                ForEach(appManager.installedModels, id: \.self) { modelName in
+                ForEach(appManager.displayedInstalledModels, id: \.self) { modelName in
                     Button {
                         Task {
                             await switchModel(modelName)
@@ -73,13 +73,9 @@ struct ModelsSettingsView: View {
     }
     
     private func switchModel(_ modelName: String) async {
-        if let model = ModelConfiguration.availableModels.first(where: {
-            $0.name == modelName
-        }) {
-            appManager.currentModelName = modelName
-            appManager.playHaptic()
-            await llm.switchModel(model)
-        }
+        appManager.currentModelName = modelName
+        appManager.playHaptic()
+        await llm.switchModel(modelName: modelName)
     }
 }
 

@@ -13,6 +13,7 @@ import SwiftUI
 
 enum LLMEvaluatorError: Error {
     case modelNotFound(String)
+    case appleIntelligenceNoLoadNeeded
 }
 
 @Observable
@@ -40,6 +41,17 @@ class LLMEvaluator {
 
     var modelConfiguration = ModelConfiguration.defaultModel
 
+    func switchModel(modelName: String) async {
+        progress = 0.0
+        if modelName == appleIntelligenceModelId {
+            loadState = .idle
+            return
+        }
+        if let model = ModelConfiguration.getModelByName(modelName) {
+            await switchModel(model)
+        }
+    }
+
     func switchModel(_ model: ModelConfiguration) async {
         progress = 0.0 // reset progress
         loadState = .idle
@@ -64,8 +76,11 @@ class LLMEvaluator {
     var loadState = LoadState.idle
 
     /// load and return the model -- can be called multiple times, subsequent calls will
-    /// just return the loaded model
+    /// just return the loaded model. Apple Intelligence does not require loading; callers should skip load for that model.
     func load(modelName: String) async throws -> ModelContainer {
+        if modelName == appleIntelligenceModelId {
+            throw LLMEvaluatorError.appleIntelligenceNoLoadNeeded
+        }
         guard let model = ModelConfiguration.getModelByName(modelName) else {
             throw LLMEvaluatorError.modelNotFound(modelName)
         }
@@ -107,6 +122,19 @@ class LLMEvaluator {
         startTime = Date()
 
         do {
+            if modelName == appleIntelligenceModelId {
+                if #available(macOS 26.0, iOS 26.0, *) {
+                    let result = try await AppleIntelligenceService.generateResponse(thread: thread, systemPrompt: systemPrompt)
+                    output = result
+                    running = false
+                    return result
+                } else {
+                    output = AppleIntelligenceService.unavailabilityMessage()
+                    running = false
+                    return output
+                }
+            }
+
             let modelContainer = try await load(modelName: modelName)
 
             // augment the prompt as needed

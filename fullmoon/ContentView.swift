@@ -38,12 +38,11 @@ struct ContentView: View {
         .environmentObject(appManager)
         .environment(llm)
         .task {
-            if appManager.installedModels.count == 0 {
+            if appManager.displayedInstalledModels.isEmpty {
                 showOnboarding.toggle()
             } else {
                 isPromptFocused = true
-                // load the model
-                if let modelName = appManager.currentModelName {
+                if let modelName = appManager.currentModelName, modelName != appleIntelligenceModelId {
                     _ = try? await llm.load(modelName: modelName)
                 }
             }
@@ -80,7 +79,7 @@ struct ContentView: View {
         .sheet(isPresented: $showOnboarding, onDismiss: dismissOnboarding) {
             OnboardingView(showOnboarding: $showOnboarding)
                 .environment(llm)
-                .interactiveDismissDisabled(appManager.installedModels.count == 0)
+                .interactiveDismissDisabled(appManager.displayedInstalledModels.isEmpty)
             
         }
         #if !os(visionOS)
