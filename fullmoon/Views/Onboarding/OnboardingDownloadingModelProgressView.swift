@@ -24,8 +24,10 @@ struct OnboardingDownloadingModelProgressView: View {
             Spacer()
             
             VStack(spacing: 16) {
-                MoonAnimationView(isDone: installed)
-                
+                Image(systemName: installed ? "checkmark.circle.fill" : "arrow.down.circle")
+                    .font(.system(size: 64))
+                    .foregroundStyle(installed ? .green : .secondary)
+
                 VStack(spacing: 4) {
                     Text(installed ? "installed" : "installing")
                         .font(.title)
