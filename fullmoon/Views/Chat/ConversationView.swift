@@ -7,6 +7,11 @@
 
 import MarkdownUI
 import SwiftUI
+#if os(macOS)
+import AppKit
+#elseif os(iOS) || os(visionOS)
+import UIKit
+#endif
 
 extension TimeInterval {
     var formatted: String {
@@ -24,8 +29,10 @@ extension TimeInterval {
 
 struct MessageView: View {
     @Environment(LLMEvaluator.self) var llm
+    @EnvironmentObject var appManager: AppManager
     @State private var collapsed = true
     let message: Message
+    var onRegenerate: (() -> Void)?
 
     var isThinking: Bool {
         !message.content.contains("</think>")
@@ -120,6 +127,15 @@ struct MessageView: View {
                         Markdown(afterThink)
                             .textSelection(.enabled)
                     }
+
+                    if message.role == .assistant {
+                        MessageResponseActions(
+                            content: message.content,
+                            onCopy: { copyToPasteboard(message.content) },
+                            onRegenerate: onRegenerate
+                        )
+                        .padding(.top, 8)
+                    }
                 }
                 .padding(.trailing, 48)
             } else {
@@ -169,6 +185,56 @@ struct MessageView: View {
         return Color(NSColor.secondarySystemFill)
         #endif
     }()
+
+    private func copyToPasteboard(_ text: String) {
+        #if os(macOS)
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        #elseif os(iOS) || os(visionOS)
+        UIPasteboard.general.string = text
+        #endif
+    }
+}
+
+private struct MessageResponseActions: View {
+    let content: String
+    let onCopy: () -> Void
+    var onRegenerate: (() -> Void)?
+
+    var body: some View {
+        HStack(spacing: 16) {
+            Button {
+                onCopy()
+            } label: {
+                Image(systemName: "doc.on.doc")
+                    .font(.subheadline)
+            }
+            .buttonStyle(.borderless)
+
+            Button {} label: {
+                Image(systemName: "hand.thumbsup")
+                    .font(.subheadline)
+            }
+            .buttonStyle(.borderless)
+
+            Button {} label: {
+                Image(systemName: "hand.thumbsdown")
+                    .font(.subheadline)
+            }
+            .buttonStyle(.borderless)
+
+            if let onRegenerate {
+                Button {
+                    onRegenerate()
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.subheadline)
+                }
+                .buttonStyle(.borderless)
+            }
+        }
+        .foregroundStyle(.secondary)
+    }
 }
 
 struct ConversationView: View {
@@ -176,6 +242,7 @@ struct ConversationView: View {
     @EnvironmentObject var appManager: AppManager
     let thread: Thread
     let generatingThreadID: UUID?
+    var onRegenerate: ((Message) -> Void)?
 
     @State private var scrollID: String?
     @State private var scrollInterrupted = false
@@ -185,14 +252,14 @@ struct ConversationView: View {
             ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(thread.sortedMessages) { message in
-                        MessageView(message: message)
+                        MessageView(message: message, onRegenerate: message.role == .assistant ? { onRegenerate?(message) } : nil)
                             .padding()
                             .id(message.id.uuidString)
                     }
 
                     if llm.running && !llm.output.isEmpty && thread.id == generatingThreadID {
                         VStack {
-                            MessageView(message: Message(role: .assistant, content: llm.output + " 🌕"))
+                            MessageView(message: Message(role: .assistant, content: llm.output))
                         }
                         .padding()
                         .id("output")

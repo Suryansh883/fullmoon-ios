@@ -40,7 +40,7 @@ struct ChatView: View {
 
     var chatInput: some View {
         HStack(alignment: .bottom, spacing: 0) {
-            TextField("message", text: $prompt, axis: .vertical)
+            TextField("Ask anything", text: $prompt, axis: .vertical)
                 .focused($isPromptFocused)
                 .textFieldStyle(.plain)
             #if os(iOS) || os(visionOS)
@@ -177,9 +177,35 @@ struct ChatView: View {
         return "chat"
     }
 
+    private var currentModelDisplayName: String {
+        guard let name = appManager.currentModelName, !name.isEmpty else {
+            return "Select model"
+        }
+        return appManager.modelDisplayName(name)
+    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
+                Button {
+                    appManager.playHaptic()
+                    showModelPicker = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(currentModelDisplayName)
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.semibold))
+                    }
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                }
+                #if os(macOS)
+                .buttonStyle(.plain)
+                #endif
+
                 if let currentThread = currentThread {
                     ConversationView(thread: currentThread, generatingThreadID: generatingThreadID)
                 } else {
@@ -193,7 +219,6 @@ struct ChatView: View {
                 }
 
                 HStack(alignment: .bottom) {
-                    modelPickerButton
                     chatInput
                 }
                 .padding()

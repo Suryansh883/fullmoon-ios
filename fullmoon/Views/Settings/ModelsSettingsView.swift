@@ -12,7 +12,7 @@ struct ModelsSettingsView: View {
     @EnvironmentObject var appManager: AppManager
     @Environment(LLMEvaluator.self) var llm
     @State var showOnboardingInstallModelView = false
-    
+
     var body: some View {
         Form {
             Section(header: Text("installed")) {
@@ -34,18 +34,27 @@ struct ModelsSettingsView: View {
                     #endif
                 }
             }
-            
+
             Button {
-                showOnboardingInstallModelView.toggle()
+                showOnboardingInstallModelView = true
             } label: {
-                Label("install a model", systemImage: "arrow.down.circle.dotted")
+                Label("Install a model", systemImage: "arrow.down.circle.dotted")
             }
             #if os(macOS)
             .buttonStyle(.borderless)
             #endif
+
+            Section {} footer: {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("On-device AI models may produce inaccurate or incomplete responses. Please verify critical information and double-check responses.")
+                        .font(.footnote)
+                    Text("Models are provided by huggingface.co.")
+                        .font(.footnote)
+                }
+            }
         }
         .formStyle(.grouped)
-        .navigationTitle("models")
+        .navigationTitle("Models")
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -63,7 +72,7 @@ struct ModelsSettingsView: View {
                         #elseif os(macOS)
                         ToolbarItem(placement: .destructiveAction) {
                             Button(action: { showOnboardingInstallModelView = false }) {
-                                Text("close")
+                                Text("Close")
                             }
                         }
                         #endif
@@ -71,7 +80,7 @@ struct ModelsSettingsView: View {
             }
         }
     }
-    
+
     private func switchModel(_ modelName: String) async {
         appManager.currentModelName = modelName
         appManager.playHaptic()
@@ -81,4 +90,6 @@ struct ModelsSettingsView: View {
 
 #Preview {
     ModelsSettingsView()
+        .environmentObject(AppManager())
+        .environment(LLMEvaluator())
 }

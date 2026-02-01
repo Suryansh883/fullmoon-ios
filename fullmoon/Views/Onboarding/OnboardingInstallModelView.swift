@@ -6,14 +6,16 @@
 //
 
 import MLXLMCommon
-import os
 import SwiftUI
 
 struct OnboardingInstallModelView: View {
     @EnvironmentObject var appManager: AppManager
+    @Environment(LLMEvaluator.self) var llm
     @State private var deviceSupportsMetal3: Bool = true
     @Binding var showOnboarding: Bool
     @State var selectedModel = ModelConfiguration.defaultModel
+    /// When non-nil, user selected this model name (appleIntelligenceModelId or MLX name).
+    @State private var selectedModelName: String?
     let suggestedModel = ModelConfiguration.defaultModel
 
     private static let sizeFormatter: NumberFormatter = {
@@ -30,123 +32,89 @@ struct OnboardingInstallModelView: View {
         return "\(formatted) GB"
     }
 
-    /// The maximum allowable model size as a fraction of the device's total RAM.
-    /// For example, a value of 0.6 means the model's size should not exceed 60% of the device's total memory.
     let modelMemoryThreshold = 0.6
-
-    var modelsList: some View {
-        Form {
-            Section {
-                VStack(spacing: 12) {
-                    Image(systemName: "arrow.down.circle.dotted")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 64, height: 64)
-                        .foregroundStyle(.primary, .tertiary)
-
-                    VStack(spacing: 4) {
-                        Text("install a model")
-                            .font(.title)
-                            .fontWeight(.semibold)
-                        Text("select from models that are optimized for apple silicon")
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                        #if DEBUG
-                        Text("ram: \(appManager.availableMemory) GB")
-                            .foregroundStyle(.red)
-                        #endif
-                    }
-                }
-                .padding(.vertical)
-                .frame(maxWidth: .infinity)
-            }
-            .listRowBackground(Color.clear)
-
-            if appManager.displayedInstalledModels.count > 0 {
-                Section(header: Text("installed")) {
-                    ForEach(appManager.displayedInstalledModels, id: \.self) { modelName in
-                        let model = modelName == appleIntelligenceModelId ? nil : ModelConfiguration.getModelByName(modelName)
-                        Button {} label: {
-                            Label {
-                                Text(appManager.modelDisplayName(modelName))
-                            } icon: {
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                        .badge(modelName == appleIntelligenceModelId ? nil : sizeBadge(model))
-                        #if os(macOS)
-                            .buttonStyle(.borderless)
-                        #endif
-                            .foregroundStyle(.secondary)
-                            .disabled(true)
-                    }
-                }
-            } else {
-                Section(header: Text("suggested")) {
-                    Button { selectedModel = suggestedModel } label: {
-                        Label {
-                            Text(appManager.modelDisplayName(suggestedModel.name))
-                                .tint(.primary)
-                        } icon: {
-                            Image(systemName: selectedModel.name == suggestedModel.name ? "checkmark.circle.fill" : "circle")
-                        }
-                    }
-                    .badge(sizeBadge(suggestedModel))
-                    #if os(macOS)
-                        .buttonStyle(.borderless)
-                    #endif
-                }
-            }
-
-            if filteredModels.count > 0 {
-                Section(header: Text("other")) {
-                    ForEach(filteredModels, id: \.name) { model in
-                        Button { selectedModel = model } label: {
-                            Label {
-                                Text(appManager.modelDisplayName(model.name))
-                                    .tint(.primary)
-                            } icon: {
-                                Image(systemName: selectedModel.name == model.name ? "checkmark.circle.fill" : "circle")
-                            }
-                        }
-                        .badge(sizeBadge(model))
-                        #if os(macOS)
-                            .buttonStyle(.borderless)
-                        #endif
-                    }
-                }
-            }
-
-            #if os(macOS)
-            Section {} footer: {
-                NavigationLink(destination: OnboardingDownloadingModelProgressView(showOnboarding: $showOnboarding, selectedModel: $selectedModel)) {
-                    Text("install")
-                        .buttonStyle(.borderedProminent)
-                }
-                .disabled(filteredModels.isEmpty)
-            }
-            .padding()
-            #endif
-        }
-        .formStyle(.grouped)
-    }
 
     var body: some View {
         ZStack {
             if deviceSupportsMetal3 {
-                modelsList
-                #if os(iOS) || os(visionOS)
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        NavigationLink(destination: OnboardingDownloadingModelProgressView(showOnboarding: $showOnboarding, selectedModel: $selectedModel)) {
-                            Text("install")
-                                .font(.headline)
+                ScrollView {
+                    VStack(spacing: 20) {
+                        VStack(spacing: 12) {
+                            Image(systemName: "arrow.down.circle.dotted")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 64, height: 64)
+                                .foregroundStyle(.primary, .tertiary)
+
+                            Text("Choose a Model")
+                                .font(.title)
+                                .fontWeight(.semibold)
+                            Text("Select your first model to get started.")
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
                         }
-                        .disabled(filteredModels.isEmpty)
+                        .padding(.top, 8)
+
+                        VStack(spacing: 12) {
+                            if AppleIntelligenceService.isAvailable {
+                                ModelCard(
+                                    title: "Apple Foundation",
+                                    description: "On-device model by Apple. Same model that powers Apple Intelligence.",
+                                    isSelected: selectedModelName == appleIntelligenceModelId,
+                                    iconName: "apple.logo"
+                                ) {
+                                    selectedModelName = appleIntelligenceModelId
+                                    selectedModel = ModelConfiguration.defaultModel
+                                }
+                            }
+
+                            ForEach(selectableMLXModels, id: \.name) { model in
+                                ModelCard(
+                                    title: appManager.modelDisplayName(model.name),
+                                    description: "A powerful model optimized for Apple Silicon. \(sizeBadge(model) ?? "")",
+                                    isSelected: selectedModelName == model.name,
+                                    iconName: "cpu"
+                                ) {
+                                    selectedModelName = model.name
+                                    selectedModel = model
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+
+                        Text("Please keep the app open during download.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .padding(.top, 8)
+
+                        VStack(spacing: 12) {
+                            Button {
+                                continueTapped()
+                            } label: {
+                                Text("Continue")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                                    #if os(iOS) || os(visionOS)
+                                    .frame(height: 44)
+                                    #endif
+                                    #if os(iOS)
+                                    .foregroundStyle(.background)
+                                    #endif
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .buttonBorderShape(.capsule)
+                            .disabled(selectedModelName == nil)
+
+                            Button("Skip") {
+                                skipTapped()
+                            }
+                            .foregroundStyle(.secondary)
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 16)
+                        .padding(.bottom, 32)
                     }
                 }
-                .listStyle(.insetGrouped)
-                #endif
                 .task {
                     checkModels()
                 }
@@ -157,14 +125,22 @@ struct OnboardingInstallModelView: View {
         .onAppear {
             checkMetal3Support()
         }
+        .background {
+            NavigationLink(
+                destination: OnboardingDownloadingModelProgressView(showOnboarding: $showOnboarding, selectedModel: $selectedModel)
+                    .environmentObject(appManager)
+                    .environment(llm),
+                isActive: $showDownloadView
+            ) {
+                EmptyView()
+            }
+            .hidden()
+        }
     }
 
-    var filteredModels: [ModelConfiguration] {
+    private var selectableMLXModels: [ModelConfiguration] {
         ModelConfiguration.availableModels
             .filter { !appManager.installedModels.contains($0.name) }
-            .filter { model in
-                !(appManager.installedModels.isEmpty && model.name == suggestedModel.name)
-            }
             .filter { model in
                 guard let size = model.modelSize else { return false }
                 return size <= Decimal(modelMemoryThreshold * appManager.availableMemory)
@@ -172,12 +148,32 @@ struct OnboardingInstallModelView: View {
             .sorted { $0.name < $1.name }
     }
 
+    private func continueTapped() {
+        guard let name = selectedModelName else { return }
+        if name == appleIntelligenceModelId {
+            appManager.currentModelName = appleIntelligenceModelId
+            showOnboarding = false
+        } else {
+            appManager.playHaptic()
+            showDownloadView = true
+        }
+    }
+
+    @State private var showDownloadView = false
+
+    private func skipTapped() {
+        appManager.currentModelName = appManager.displayedInstalledModels.first
+        showOnboarding = false
+    }
+
     func checkModels() {
-        // automatically select the first available model
-        if appManager.installedModels.contains(suggestedModel.name) {
-            if let model = filteredModels.first {
-                selectedModel = model
-            }
+        if selectedModelName == nil, AppleIntelligenceService.isAvailable {
+            selectedModelName = appleIntelligenceModelId
+            return
+        }
+        if selectedModelName == nil, let first = selectableMLXModels.first {
+            selectedModelName = first.name
+            selectedModel = first
         }
     }
 
@@ -190,9 +186,53 @@ struct OnboardingInstallModelView: View {
     }
 }
 
-#Preview {
-    @Previewable @State var appManager = AppManager()
+private struct ModelCard: View {
+    let title: String
+    let description: String
+    let isSelected: Bool
+    let iconName: String
+    let action: () -> Void
 
+    var body: some View {
+        Button(action: action) {
+            HStack(alignment: .top, spacing: 16) {
+                Image(systemName: iconName)
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 32, height: 32)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    Text(description)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .foregroundStyle(isSelected ? .blue : .secondary)
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.primary.opacity(isSelected ? 0.06 : 0.03))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isSelected ? Color.primary.opacity(0.3) : Color.clear, lineWidth: 2)
+            )
+        }
+        #if os(macOS)
+        .buttonStyle(.plain)
+        #endif
+    }
+}
+
+#Preview {
     OnboardingInstallModelView(showOnboarding: .constant(true))
-        .environmentObject(appManager)
+        .environmentObject(AppManager())
+        .environment(LLMEvaluator())
 }
