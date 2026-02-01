@@ -32,7 +32,6 @@ struct MessageView: View {
     @EnvironmentObject var appManager: AppManager
     @State private var collapsed = true
     let message: Message
-    var onRegenerate: (() -> Void)?
 
     var isThinking: Bool {
         !message.content.contains("</think>")
@@ -129,15 +128,16 @@ struct MessageView: View {
                     }
 
                     if message.role == .assistant {
-                        MessageResponseActions(
-                            content: message.content,
-                            onCopy: { copyToPasteboard(message.content) },
-                            onRegenerate: onRegenerate
-                        )
-                        .padding(.top, 8)
+                        MessageResponseActions(onCopy: { copyToPasteboard(message.content) })
+                            .padding(.top, 8)
                     }
                 }
                 .padding(.trailing, 48)
+                .contextMenu {
+                    Button("Copy", systemImage: "doc.on.doc") {
+                        copyToPasteboard(message.content)
+                    }
+                }
             } else {
                 Markdown(message.content)
                     .textSelection(.enabled)
@@ -187,53 +187,37 @@ struct MessageView: View {
     }()
 
     private func copyToPasteboard(_ text: String) {
+        guard !text.isEmpty else { return }
         #if os(macOS)
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
         #elseif os(iOS) || os(visionOS)
         UIPasteboard.general.string = text
         #endif
+        appManager.playHaptic()
     }
 }
 
 private struct MessageResponseActions: View {
-    let content: String
     let onCopy: () -> Void
-    var onRegenerate: (() -> Void)?
+    @State private var showCopied = false
 
     var body: some View {
-        HStack(spacing: 16) {
-            Button {
-                onCopy()
-            } label: {
-                Image(systemName: "doc.on.doc")
-                    .font(.subheadline)
+        Button {
+            onCopy()
+            showCopied = true
+            Task {
+                try? await Task.sleep(for: .seconds(2))
+                showCopied = false
             }
-            .buttonStyle(.borderless)
-
-            Button {} label: {
-                Image(systemName: "hand.thumbsup")
-                    .font(.subheadline)
-            }
-            .buttonStyle(.borderless)
-
-            Button {} label: {
-                Image(systemName: "hand.thumbsdown")
-                    .font(.subheadline)
-            }
-            .buttonStyle(.borderless)
-
-            if let onRegenerate {
-                Button {
-                    onRegenerate()
-                } label: {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.subheadline)
-                }
-                .buttonStyle(.borderless)
-            }
+        } label: {
+            Image(systemName: showCopied ? "checkmark" : "doc.on.doc")
+                .font(.subheadline)
+                .contentShape(Rectangle())
+                .frame(minWidth: 44, minHeight: 44)
         }
-        .foregroundStyle(.secondary)
+        .buttonStyle(.plain)
+        .foregroundStyle(showCopied ? .green : .secondary)
     }
 }
 
@@ -242,7 +226,6 @@ struct ConversationView: View {
     @EnvironmentObject var appManager: AppManager
     let thread: Thread
     let generatingThreadID: UUID?
-    var onRegenerate: ((Message) -> Void)?
 
     @State private var scrollID: String?
     @State private var scrollInterrupted = false
@@ -252,7 +235,7 @@ struct ConversationView: View {
             ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(thread.sortedMessages) { message in
-                        MessageView(message: message, onRegenerate: message.role == .assistant ? { onRegenerate?(message) } : nil)
+                        MessageView(message: message)
                             .padding()
                             .id(message.id.uuidString)
                     }
