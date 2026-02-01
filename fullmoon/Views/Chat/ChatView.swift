@@ -6,6 +6,7 @@
 //
 
 import MarkdownUI
+import Metal
 import SwiftUI
 
 struct ChatView: View {
@@ -186,42 +187,63 @@ struct ChatView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                Button {
-                    appManager.playHaptic()
-                    showModelPicker = true
-                } label: {
-                    HStack(spacing: 4) {
-                        Text(currentModelDisplayName)
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                        Image(systemName: "chevron.right")
-                            .font(.caption.weight(.semibold))
-                    }
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                }
-                #if os(macOS)
-                .buttonStyle(.plain)
-                #endif
-
-                if let currentThread = currentThread {
-                    ConversationView(thread: currentThread, generatingThreadID: generatingThreadID)
+            ZStack {
+                if MTLCreateSystemDefaultDevice() != nil {
+                    LightRaysMetalView(
+                        raysOrigin: .topCenter,
+                        raysColor: .white,
+                        raysSpeed: 0.8,
+                        lightSpread: 0.5,
+                        rayLength: 3.0,
+                        noiseAmount: 0.0,
+                        distortion: 0.0,
+                        pulsating: false,
+                        fadeDistance: 1.0,
+                        saturation: 1.0
+                    )
+                    .ignoresSafeArea()
                 } else {
-                    Spacer()
-                    Image(systemName: appManager.getMoonPhaseIcon())
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 32, height: 32)
-                        .foregroundStyle(.quaternary)
-                    Spacer()
+                    Color(red: 0.08, green: 0.06, blue: 0.1)
+                        .ignoresSafeArea()
                 }
 
-                HStack(alignment: .bottom) {
-                    chatInput
+                VStack(spacing: 0) {
+                    Button {
+                        appManager.playHaptic()
+                        showModelPicker = true
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(currentModelDisplayName)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.semibold))
+                        }
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                    }
+                    #if os(macOS)
+                    .buttonStyle(.plain)
+                    #endif
+
+                    if let currentThread = currentThread {
+                        ConversationView(thread: currentThread, generatingThreadID: generatingThreadID)
+                    } else {
+                        Spacer()
+                        Image(systemName: appManager.getMoonPhaseIcon())
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 32, height: 32)
+                            .foregroundStyle(.white.opacity(0.7))
+                        Spacer()
+                    }
+
+                    HStack(alignment: .bottom) {
+                        chatInput
+                    }
+                    .padding()
                 }
-                .padding()
             }
             .navigationTitle(chatTitle)
             #if os(iOS) || os(visionOS)

@@ -12,7 +12,7 @@
           "image-name" : "custom.sparkles.hexagon 1.png",
           "name" : "custom.sparkles.hexagon 1",
           "position" : {
-            "scale" : 1,
+            "scale" : 1.2,
             "translation-in-points" : [
               0,
               0

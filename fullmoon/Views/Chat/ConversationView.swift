@@ -123,13 +123,15 @@ struct MessageView: View {
                     }
 
                     if let afterThink {
-                        Markdown(afterThink)
-                            .textSelection(.enabled)
-                    }
-
-                    if message.role == .assistant {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Markdown(afterThink)
+                                .textSelection(.enabled)
+                            if message.role == .assistant {
+                                MessageResponseActions(onCopy: { copyToPasteboard(message.content) })
+                            }
+                        }
+                    } else if message.role == .assistant {
                         MessageResponseActions(onCopy: { copyToPasteboard(message.content) })
-                            .padding(.top, 8)
                     }
                 }
                 .padding(.trailing, 48)
@@ -214,7 +216,7 @@ private struct MessageResponseActions: View {
             Image(systemName: showCopied ? "checkmark" : "doc.on.doc")
                 .font(.subheadline)
                 .contentShape(Rectangle())
-                .frame(minWidth: 44, minHeight: 44)
+                .frame(minWidth: 44, minHeight: 32, alignment: .leading)
         }
         .buttonStyle(.plain)
         .foregroundStyle(showCopied ? .green : .secondary)
